@@ -13,36 +13,6 @@ Installation Info:
 
 For full list of package versions, see [requirements.txt](requirements.txt).
 
-## 🧪 Steps to Replicate
-
-1. **Download WAW-TACE Dataset**  
-   Download the dataset from [Zenodo](https://zenodo.org/records/12741586).  
-   - Ensure that `ct_hcc_metadata_v2.csv` is placed in the project root directory.  
-   - Extract the contents of `ct_scans_[1-4]_4_wawtace_09_05_24.zip` into the `images/` folder.
-
-2. **Extract Radiomic Statistics with TotalSegmentator (TS)**  
-   Use TotalSegmentator to segment abdominal organs and extract radiomic features. The features are saved as `.pkl` files.
-
-   **Example (single case):**
-   ```bash
-   python ts_get_stats.py /path/to/WAW-TACE/images/388/388_2_scan.nii.gz stats/388_2_scan.pkl
-   ```
-
-   **Batch processing (parallelized):**  
-   To process multiple scans in parallel, use GNU `parallel`:
-   ```bash
-   parallel --jobs 4 < ts_get_stats.sh
-   ```
-   
-   Make sure `ts_get_stats.sh` contains one command per line.
-
-3. **Train the XGBoost Model**  
-   Set the `data_root` variable in `train.py` to the directory containing the dumped `.pkl` stats files, then run:
-
-   ```bash
-   python train.py
-   ```
-
 ## 🔍 Run Inference
 
 To predict the phase of new CT scans run `totalseg_get_phase.py`. Latest model is currently: `xgb_wawtace.pkl`.
@@ -75,6 +45,42 @@ Example output:
 }
 ```
 
+## 🧪 Replicating Experiment
+
+<details>
+
+<summary>Details</summary>
+
+1. **Download WAW-TACE Dataset**  
+   Download the dataset from [Zenodo](https://zenodo.org/records/12741586).  
+   - Ensure that `ct_hcc_metadata_v2.csv` is placed in the project root directory.  
+   - Extract the contents of `ct_scans_[1-4]_4_wawtace_09_05_24.zip` into the `images/` folder.
+
+2. **Extract Radiomic Statistics with TotalSegmentator (TS)**  
+   Use TotalSegmentator to segment abdominal organs and extract radiomic features. The features are saved as `.pkl` files.
+
+   **Example (single case):**
+   ```bash
+   python ts_get_stats.py /path/to/WAW-TACE/images/388/388_2_scan.nii.gz stats/388_2_scan.pkl
+   ```
+
+   **Batch processing (parallelized):**  
+   To process multiple scans in parallel, use GNU `parallel`:
+   ```bash
+   parallel --jobs 4 < ts_get_stats.sh
+   ```
+   
+   Make sure `ts_get_stats.sh` contains one command per line.
+
+3. **Train the XGBoost Model**  
+   Set the `data_root` variable in `train.py` to the directory containing the dumped `.pkl` stats files, then run:
+
+   ```bash
+   python train.py
+   ```
+   
+</details>
+
 ## 🙏 Acknowledgement
 
 This research was supported by the Intramural Research Program of the National Institutes of Health (NIH); National Library of Medicine (NLM) and Clinical Center (CC). This work utilized the computational resources of the NIH high-performance computing Biowulf cluster ([https://hpc.nih.gov/](https://hpc.nih.gov/)).
@@ -84,12 +90,11 @@ This research was supported by the Intramural Research Program of the National I
 If you use this code or model in your research, please cite:
 
 ```
-@misc{ctphase2025,
+@article{hou2025segment,
   title={Segment-and-Classify: ROI-Guided Generalizable Contrast Phase Classification in CT Using XGBoost},
   author={Hou, Benjamin and Mathai, Tejas Sudharshan and Mukherjee, Pritam and Wang, Xinya and Summers, Ronald M and Lu, Zhiyong},
-  year={2025},
-  howpublished={\url{https://github.com/farrell236/CTPhase-XGBoost}},
-  note={GitHub repository}
+  journal={arXiv preprint arXiv:2501.14066},
+  year={2025}
 }
 
 @article{wasserthal2023totalsegmentator,
@@ -100,17 +105,6 @@ If you use this code or model in your research, please cite:
   number={5},
   pages={e230024},
   year={2023},
-  publisher={Radiological Society of North America}
-}
-
-@article{bartnik2024waw,
-  title={WAW-TACE: A Hepatocellular Carcinoma Multiphase CT Dataset with Segmentations, Radiomics Features, and Clinical Data},
-  author={Bartnik, Krzysztof and Bartczak, Tomasz and Krzyzi{\'n}ski, Mateusz and Korzeniowski, Krzysztof and Lamparski, Krzysztof and W{\k{e}}grzyn, Piotr and Lam, Eric and Bartkowiak, Mateusz and Wr{\'o}blewski, Tadeusz and Mech, Katarzyna and others},
-  journal={Radiology: Artificial Intelligence},
-  volume={6},
-  number={6},
-  pages={e240296},
-  year={2024},
   publisher={Radiological Society of North America}
 }
 ```
